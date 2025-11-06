@@ -52,7 +52,8 @@ max_input_voltage = 12700      # Maximum allowed input voltage
 max_power = 200                # Max of 130W based on 150w PSU and on DC plug
 
 stabilization_time = 150
-hashrate_tolerance = 0.9875 # 98.75%
+hashrate_tolerance = 0.99   # 99% - accepted as valid setting
+hr_eff_final = 99.5         # 99.5 % - what is accepted as finally stable setting
 
 # Add these variables to the global configuration section
 small_core_count = None
@@ -332,12 +333,14 @@ def save_results():
         print(RED + f"Error saving results to file: {e}" + RESET)
 
 def reset_to_best_setting():
-    if not results:
+
+    best_result = sorted([x for x in results if x["hashrateEfficiency"] > hr_eff_final], key=lambda x: x["averageHashRate"], reverse=True)[0]
+    
+    if (not results) or (not best_result):
         print(YELLOW + "No valid benchmarking results found. Applying predefined default settings." + RESET)
         set_system_settings(default_voltage, default_frequency)
     else:
-        #best_result = sorted(results, key=lambda x: x["averageHashRate"], reverse=True)[0]
-        best_result = sorted([x for x in results if x["hashrateEfficiency"] > 99.0], key=lambda x: x["averageHashRate"], reverse=True)[0]
+        #best_result = sorted(results, key=lambda x: x["averageHashRate"], reverse=True)[0]        
         best_voltage = best_result["coreVoltage"]
         best_frequency = best_result["frequency"]
 
