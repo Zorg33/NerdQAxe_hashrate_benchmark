@@ -5,7 +5,8 @@ THIS FORK IS MAINLY FOR OPTIMIZATION PURPOSES
 - MUCH FASTER - Finds the best setting within an hour
 - HASHRATE EFFICIENCY CONDITIONS - Must be > 99.5%
 - SOME VALUES ARE OPTIMIZED FOR NerdQAxe++ BUT SHOULD WORK FOR Octa, Eko, etc.
-
+**- INITIAL PARAMETERS ARE CONFIGURED FOR WELL COOLED MINERS THAT CAN WITHSTAND 150W+. AT LEAST AN EXTRA FAN IS NEEDED AT THE BACK. YOU MUST LOWER THE WATTAGE AND MAX CLOCK VALUES AT THE BEGINNING OF THE SCRIPT!
+**
 Easiest is to use the best found configuration and maybe add +10mV just to be sure. You can test the exact setting with the +10mV if it increases the hashrate efficiency.
 
 ## Disclaimer
@@ -172,5 +173,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.
+
 
 
