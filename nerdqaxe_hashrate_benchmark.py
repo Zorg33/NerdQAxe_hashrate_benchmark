@@ -169,7 +169,7 @@ def set_system_settings(core_voltage, frequency):
         response.raise_for_status()  # Raise an exception for HTTP errors
         print(YELLOW + f"Applying settings: Voltage = {core_voltage}mV, Frequency = {frequency}MHz" + RESET)
         time.sleep(2)
-        #restart_system()
+        restart_system()
     except requests.exceptions.RequestException as e:
         print(RED + f"Error setting system settings: {e}" + RESET)
 
@@ -356,7 +356,7 @@ def reset_to_best_setting():
                       f"  Frequency: {best_frequency}MHz" + RESET)
         set_system_settings(best_voltage, best_frequency)
     
-    restart_system()
+    #restart_system()
 
 # Main benchmarking process
 try:
@@ -424,7 +424,7 @@ except Exception as e:
     else:
         print(YELLOW + "No valid benchmarking results found. Applying predefined default settings." + RESET)
         set_system_settings(default_voltage, default_frequency)
-        restart_system()
+        #restart_system()
 finally:
     if not system_reset_done:
         if results:
@@ -434,7 +434,7 @@ finally:
         else:
             print(YELLOW + "No valid benchmarking results found. Applying predefined default settings." + RESET)
             set_system_settings(default_voltage, default_frequency)
-            restart_system()
+            #restart_system()
         system_reset_done = True
 
     # Print results summary only if we have results
