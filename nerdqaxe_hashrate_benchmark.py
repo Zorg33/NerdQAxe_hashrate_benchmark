@@ -54,9 +54,10 @@ max_power = 200                # Max of 130W based on 150w PSU and on DC plug
 stabilization_time = 150
 hashrate_tolerance = 0.99   # 99% - accepted as valid setting
 hr_eff_final = 99.5         # 99.5 % - what is accepted as finally stable setting
+hr_eff_low = 94.0             # 94% - invalid setting threshold -> jump to next iteration
 
 # Add these variables to the global configuration section
-small_core_count = None
+small_core_count = 8160
 asic_count = 4
 
 # Add these constants to the configuration section
@@ -109,7 +110,7 @@ def fetch_default_settings():
         print(RED + f"Error fetching default system settings: {e}. Using fallback defaults." + RESET)
         default_voltage = 1150
         default_frequency = 600
-        small_core_count = 0
+        small_core_count = 8160
         asic_count = 4
 
 # Add a global flag to track whether the system has already been reset
@@ -180,13 +181,13 @@ def restart_system():
         # Restart here as some bitaxes get unstable with bad settings
         # If not an interrupt, wait 900s for system stabilization as some bitaxes are slow to ramp up
         if not is_interrupt:
-            print(YELLOW + f"Applying new settings and waiting 15s for system stabilization..." + RESET)
+            print(YELLOW + f"Applying new settings and waiting 30s for system stabilization..." + RESET)
             # WHY? - restart not needed any more
             #print(YELLOW + f"Applying new settings and waiting {stabilization_time}s for system stabilization..." + RESET)
             #response = requests.post(f"{bitaxe_ip}/api/system/restart", timeout=10)
             #response.raise_for_status()  # Raise an exception for HTTP errors
             #time.sleep(stabilization_time)  # Allow 1200s time for the system to restart and start hashing
-            time.sleep(15)
+            time.sleep(30)
         else:
             print(YELLOW + "Applying final settings..." + RESET)
             response = requests.post(f"{bitaxe_ip}/api/system/restart", timeout=10)
@@ -249,7 +250,12 @@ def benchmark_iteration(core_voltage, frequency):
         if power_consumption > max_power:
             print(RED + f"Power consumption exceeded {max_power}W! Stopping current benchmark." + RESET)
             return None, None, None, False, None, None, "POWER_CONSUMPTION_EXCEEDED"
-        
+
+        hr_eff_actual = 100 * hash_rate / expected_hashrate
+        if hr_eff_actual <= hr_eff_low:
+            print(RED + "Warning: Low hashrate detected, skipping iteration" + RESET)
+            return None, None, None, False, None, None, "LOW_EFFICIENCY"
+
         hash_rates.append(hash_rate)
         temperatures.append(temp)
         power_consumptions.append(power_consumption)
@@ -263,7 +269,7 @@ def benchmark_iteration(core_voltage, frequency):
             f"{percentage_progress:5.1f}% | "
             f"CV: {core_voltage:4d} mV | "
             f"F: {frequency:4d} MHz | "
-            f"H: {int(hash_rate):4d} GH/s ({(100 * hash_rate / expected_hashrate):.2f} %)| "
+            f"H: {int(hash_rate):4d} GH/s ({hr_eff_actual:.2f} %)| "
             f"IV: {int(voltage):4d} mV | "
             f"T: {int(temp):2d}°C"
         )
@@ -386,6 +392,7 @@ try:
                 
             results.append(result)
 
+        if avg_hashrate is not None or error_reason == "LOW_EFFICIENCY":
             if hashrate_ok:
                 # If hashrate is good, try increasing frequency
                 if current_frequency + frequency_increment <= max_allowed_frequency:
