@@ -52,9 +52,9 @@ max_input_voltage = 12700      # Maximum allowed input voltage
 max_power = 200                # Max of 130W based on 150w PSU and on DC plug
 
 stabilization_time = 150
-hashrate_tolerance = 0.99   # 99% - accepted as valid setting
-hr_eff_final = 99.5         # 99.5 % - what is accepted as finally stable setting
-hr_eff_low = 94.0             # 94% - invalid setting threshold -> jump to next iteration
+hashrate_tolerance = 0.995  # 99.5% - accepted as valid setting
+hr_eff_final = 99.5         # 99.5% - what is accepted as finally stable setting (can be higher)
+hr_eff_low = 94.0           # 94.0% - invalid setting threshold -> jump to next iteration
 
 # Add these variables to the global configuration section
 small_core_count = 8160
@@ -169,7 +169,7 @@ def set_system_settings(core_voltage, frequency):
         response.raise_for_status()  # Raise an exception for HTTP errors
         print(YELLOW + f"Applying settings: Voltage = {core_voltage}mV, Frequency = {frequency}MHz" + RESET)
         time.sleep(2)
-        restart_system()
+        #restart_system()
     except requests.exceptions.RequestException as e:
         print(RED + f"Error setting system settings: {e}" + RESET)
 
@@ -497,7 +497,7 @@ finally:
         
         print(GREEN + "Benchmarking completed." + RESET)
         if top_5_results:
-            print(GREEN + "\nTop 5 Highest Hashrate Settings:" + RESET)
+            print(YELLOW + "\nTop 5 Highest Hashrate Settings:" + RESET)
             for i, result in enumerate(top_5_results, 1):
                 print(GREEN + f"\nRank {i}:" + RESET)
                 print(GREEN + f"  Core Voltage: {result['coreVoltage']}mV" + RESET)
@@ -509,7 +509,7 @@ finally:
                 if "averageVRTemp" in result:
                     print(GREEN + f"  Average VR Temperature: {result['averageVRTemp']:.2f}°C" + RESET)
             
-            print(GREEN + "\nTop 5 Most Hashrate Efficient Settings:" + RESET)
+            print(YELLOW + "\nTop 5 Most Hashrate Efficient Settings:" + RESET)
             for i, result in enumerate(top_5_hr_eff_results, 1):
                 print(GREEN + f"\nRank {i}:" + RESET)
                 print(GREEN + f"  Core Voltage: {result['coreVoltage']}mV" + RESET)
@@ -521,7 +521,7 @@ finally:
                 if "averageVRTemp" in result:
                     print(GREEN + f"  Average VR Temperature: {result['averageVRTemp']:.2f}°C" + RESET)
 
-            print(GREEN + "\nTop 5 Most Efficient Settings:" + RESET)
+            print(YELLOW + "\nTop 5 Most Efficient Settings:" + RESET)
             for i, result in enumerate(top_5_efficient_results, 1):
                 print(GREEN + f"\nRank {i}:" + RESET)
                 print(GREEN + f"  Core Voltage: {result['coreVoltage']}mV" + RESET)
