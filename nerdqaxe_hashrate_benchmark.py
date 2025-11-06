@@ -190,8 +190,8 @@ def restart_system():
             time.sleep(30)
         else:
             print(YELLOW + "Applying final settings..." + RESET)
-            response = requests.post(f"{bitaxe_ip}/api/system/restart", timeout=10)
-            response.raise_for_status()  # Raise an exception for HTTP errors
+            #response = requests.post(f"{bitaxe_ip}/api/system/restart", timeout=10)
+            #response.raise_for_status()  # Raise an exception for HTTP errors
     except requests.exceptions.RequestException as e:
         print(RED + f"Error restarting the system: {e}" + RESET)
 
@@ -252,9 +252,6 @@ def benchmark_iteration(core_voltage, frequency):
             return None, None, None, False, None, None, "POWER_CONSUMPTION_EXCEEDED"
 
         hr_eff_actual = 100 * hash_rate / expected_hashrate
-        if hr_eff_actual <= hr_eff_low:
-            print(RED + "Warning: Low hashrate detected, skipping iteration" + RESET)
-            return None, None, None, False, None, None, "LOW_EFFICIENCY"
 
         hash_rates.append(hash_rate)
         temperatures.append(temp)
@@ -276,7 +273,11 @@ def benchmark_iteration(core_voltage, frequency):
         if vr_temp is not None and vr_temp > 0:
             status_line += f" | VR: {int(vr_temp):2d}°C"
         print(status_line + RESET)
-        
+
+        if hr_eff_actual <= hr_eff_low:
+            print(RED + "Warning: Low hashrate detected, skipping iteration" + RESET)
+            return None, None, None, False, None, None, "LOW_EFFICIENCY"
+
         # Only sleep if it's not the last iteration
         if sample < total_samples - 1:
             time.sleep(sample_interval)
@@ -405,7 +406,7 @@ try:
                     current_voltage += voltage_increment
                     #current_frequency -= frequency_increment  # Go back to one frequency step and retry
                     #print(YELLOW + f"Hashrate to low compared to expected. Decreasing frequency to {current_frequency}MHz and increasing voltage to {current_voltage}mV" + RESET)
-                    print(YELLOW + f"Hashrate to low compared to expected. Keeping frequency of {current_frequency}MHz and increasing voltage to {current_voltage}mV" + RESET)
+                    print(YELLOW + f"Hashrate to low compared to expected. Keeping frequency at {current_frequency}MHz and increasing voltage to {current_voltage}mV" + RESET)
                 else:
                     break  # We've reached max voltage without good results
         else:
