@@ -23,6 +23,8 @@ def parse_arguments():
                        help='Initial voltage in mV (default: 1150)')
     parser.add_argument('-f', '--frequency', type=int, default=600,
                        help='Initial frequency in MHz (default: 600)')
+    parser.add_argument('-fmax', '--max_frequency', type=int, default=1000,
+                       help='Maximum frequency in MHz (default: 1000)')
     
     # If no arguments are provided, print help and exit
     if len(sys.argv) == 1:
@@ -45,7 +47,7 @@ benchmark_time = 180          # 3 minutes benchmark time
 sample_interval = 3         # 15 seconds sample interval
 max_temp = 68                 # Will stop if temperature reaches or exceeds this value
 max_allowed_voltage = 1400    # Maximum allowed core voltage
-max_allowed_frequency = 1000  # Maximum allowed core frequency
+max_allowed_frequency = args.max_frequency  # Maximum allowed core frequency (default 1000MHz)
 max_vr_temp = 75              # Maximum allowed voltage regulator temperature
 min_input_voltage = 11600      # Minimum allowed input voltage
 max_input_voltage = 12700      # Maximum allowed input voltage
